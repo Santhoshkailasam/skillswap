@@ -29,6 +29,22 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
 
+      - name: 📦 Compile React Native Android Bundle
+        run: |
+          mkdir -p build_bundle/res
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output build_bundle/index.android.bundle \
+            --assets-dest build_bundle/res
+
+      - name: 🗜️ Archive Bundle to ZIP
+        run: |
+          cd build_bundle
+          zip -r ../bundle.zip index.android.bundle res
+          cd ..
+
       - name: 🚀 Publish Release to CodePush Server
         run: node scripts/publish-release.mjs
         env:

@@ -72,7 +72,7 @@ const MATCHES_DATA: SkillMatch[] = [
   },
   {
     id: '5',
-    name: 'Sarah Jenkins',
+    name: 'Iron man',
     initials: 'SJ',
     avatarColor: '#F59E0B',
     matchScore: 89,
