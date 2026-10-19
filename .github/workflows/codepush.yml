@@ -1,0 +1,44 @@
+name: CodePush Auto-Release & Live Sync
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: ⚙️ Generate Version & Metadata
+        id: vars
+        run: |
+          VERSION="1.1.$(date +'%Y%m%d%H%M')"
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+
+      - name: 🚀 Publish Release to CodePush Server
+        run: |
+          curl -X POST "https://codepushs.netlify.app/.netlify/functions/publish-release" \
+            -H "Content-Type: application/json" \
+            -H "x-codepush-api-key: ${{ secrets.CODEPUSH_API_KEY }}" \
+            -d '{
+              "platform": "android",
+              "projectId": "app_rCYp1a_mvdfs5j4_w9dyc",
+              "version": "'"${{ steps.vars.outputs.version }}"'",
+              "downloadUrl": "https://codepushs.netlify.app/bundles/android-v'"${{ steps.vars.outputs.version }}"'.zip",
+              "mandatory": true,
+              "releaseNotes": "Git Push Commit: '"${{ steps.vars.outputs.commit_msg }}"'"
+            }'

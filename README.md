@@ -32,6 +32,8 @@ npm run android
 yarn android
 ```
 
+> 📶 **Running over Wi-Fi?** Check out the [Wi-Fi Debugging Guide](docs/WIFI_DEBUGGING.md) to run and debug wirelessly without a USB cable.
+
 ### iOS
 
 For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
@@ -73,9 +75,13 @@ When you want to forcefully reload, for example to reset the state of your app, 
 - **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
 - **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
-## Congratulations! :tada:
+### Production & Release 🚀
 
-You've successfully run and modified your React Native App. :partying_face:
+Ready to build the standalone APK or release to Google Play Store?
+Check out the complete [Production & Release Guide](docs/PRODUCTION_GUIDE.md):
+- 📦 **Standalone Release APK:** Build & install directly on any phone without a dev server.
+- 🏪 **Google Play Store:** Keystore generation and `.aab` Android App Bundle creation.
+- ⚡ **Over-The-Air Updates:** Publish instant JS updates via CodePush.
 
 ### Now what?
 

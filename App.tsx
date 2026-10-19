@@ -1,44 +1,122 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  Alert,
+} from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { Colors } from './src/theme/colors';
+import { SplashScreen } from './src/screens/SplashScreen';
+import { DashboardHeader } from './src/components/DashboardHeader';
+import { DashboardScreen } from './src/screens/DashboardScreen';
+import { MatchesScreen } from './src/screens/MatchesScreen';
+import { MessagesScreen } from './src/screens/MessagesScreen';
+import { ProfileScreen } from './src/screens/ProfileScreen';
+import { BottomTabBar, TabKey } from './src/components/BottomTabBar';
+import { CreateSwapModal } from './src/components/CreateSwapModal';
+import { CodePushService } from './src/services/CodePushService';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return (
+      <SafeAreaProvider>
+        <SplashScreen onFinish={() => setShowSplash(false)} />
+      </SafeAreaProvider>
+    );
+  }
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <MainApp />
     </SafeAreaProvider>
   );
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
+function MainApp() {
+  const insets = useSafeAreaInsets();
+  const [currentTab, setCurrentTab] = useState<TabKey>('explore');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    // 1. Check for OTA update on launch
+    CodePushService.checkForUpdates();
+
+    // 2. ⚡ Start real-time live alert listener (pops up immediately when Send is clicked)
+    const stopListener = CodePushService.startLiveAlertListener();
+    return () => stopListener();
+  }, []);
+
+  const handleFilterPress = () => {
+    Alert.alert(
+      'Filter Swaps',
+      'Choose swap preferences:\n• Level: Beginner to Pro\n• Timezone: Compatible (±3 hrs)\n• Format: 1-on-1 Live Video'
+    );
+  };
+
+  const handleNotificationPress = () => {
+    Alert.alert(
+      'Notifications (3 unread)',
+      '1. Elena accepted your swap invite for 3D Blender\n2. You earned +40 Skill Points from last session\n3. Marcus Chen viewed your React Native profile'
+    );
+  };
+
+  const handleTabSelect = (tab: TabKey) => {
+    if (tab === 'create') {
+      setIsCreateModalOpen(true);
+    } else {
+      setCurrentTab(tab);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
+    <View style={[styles.rootContainer, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Clean Premium Dashboard Header */}
+      <DashboardHeader
+        unreadNotifications={3}
+        onNotificationPress={handleNotificationPress}
+      />
+
+      {/* Screen Body View based on Active Tab */}
+      <View style={styles.screenContainer}>
+        {currentTab === 'explore' && <DashboardScreen />}
+        {currentTab === 'matches' && <MatchesScreen />}
+        {currentTab === 'messages' && <MessagesScreen />}
+        {currentTab === 'profile' && <ProfileScreen />}
+      </View>
+
+      {/* Floating Glassmorphic Bottom Tab Navigation */}
+      <BottomTabBar
+        currentTab={currentTab}
+        onTabSelect={handleTabSelect}
+        onCreateSwapPress={() => setIsCreateModalOpen(true)}
+      />
+
+      {/* Create / Post Swap Sheet */}
+      <CreateSwapModal
+        visible={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  rootContainer: {
     flex: 1,
+    backgroundColor: '#0284C7',
+  },
+  screenContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
 });
 
