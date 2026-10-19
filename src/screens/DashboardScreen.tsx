@@ -62,7 +62,7 @@ const MATCHES_DATA: SkillMatch[] = [
   },
   {
     id: '4',
-    name: 'Lucas Silva',
+    name: 'Spiderman',
     initials: 'LS',
     avatarColor: '#10B981',
     matchScore: 91,
