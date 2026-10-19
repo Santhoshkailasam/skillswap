@@ -42,7 +42,7 @@ const MATCHES_DATA: SkillMatch[] = [
   },
   {
     id: '2',
-    name: 'Dr. Aris Thorne',
+    name: 'peter parker',
     initials: 'AT',
     avatarColor: '#0284C7',
     matchScore: 95,
