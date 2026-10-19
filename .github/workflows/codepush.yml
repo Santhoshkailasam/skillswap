@@ -31,14 +31,49 @@ jobs:
 
       - name: 🚀 Publish Release to CodePush Server
         run: |
-          curl -X POST "https://codepushs.netlify.app/.netlify/functions/publish-release" \
-            -H "Content-Type: application/json" \
-            -H "x-codepush-api-key: ${{ secrets.CODEPUSH_API_KEY }}" \
-            -d '{
-              "platform": "android",
-              "projectId": "app_rCYp1a_mvdfs5j4_w9dyc",
-              "version": "'"${{ steps.vars.outputs.version }}"'",
-              "downloadUrl": "https://codepushs.netlify.app/bundles/android-v'"${{ steps.vars.outputs.version }}"'.zip",
-              "mandatory": true,
-              "releaseNotes": "Git Push Commit: '"${{ steps.vars.outputs.commit_msg }}"'"
-            }'
+          node -e '
+            const version = process.env.RELEASE_VERSION;
+            const commitMsg = process.env.COMMIT_MSG || "App update";
+            const apiKey = process.env.CODEPUSH_API_KEY;
+            
+            if (!apiKey) {
+              console.error("❌ ERROR: CODEPUSH_API_KEY secret is not set in GitHub repository settings!");
+              process.exit(1);
+            }
+
+            const payload = {
+              platform: "android",
+              projectId: "app_rCYp1a_mvdfs5j4_w9dyc",
+              version: version,
+              downloadUrl: `https://codepushs.netlify.app/bundles/android-v${version}.zip`,
+              mandatory: true,
+              releaseNotes: `Git Push: ${commitMsg}`
+            };
+
+            fetch("https://codepushs.netlify.app/.netlify/functions/publish-release", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-codepush-api-key": apiKey
+              },
+              body: JSON.stringify(payload)
+            })
+            .then(async (res) => {
+              const data = await res.json();
+              console.log("Server response status:", res.status);
+              console.log("Server response body:", JSON.stringify(data, null, 2));
+              if (!res.ok) {
+                console.error("Failed to publish release:", data.error || res.statusText);
+                process.exit(1);
+              }
+              console.log("✅ Release successfully published to CodePush!");
+            })
+            .catch((err) => {
+              console.error("Request error:", err);
+              process.exit(1);
+            });
+          '
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.version }}
+          COMMIT_MSG: ${{ steps.vars.outputs.commit_msg }}
+          CODEPUSH_API_KEY: ${{ secrets.CODEPUSH_API_KEY }}
