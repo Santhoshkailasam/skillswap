@@ -38,7 +38,7 @@ const MATCHES: MatchItem[] = [
   },
   {
     id: 'm2',
-    name: 'Amara Okafor',
+    name: 'Raja',
     initials: 'AO',
     color: '#8B5CF6',
     matchScore: 96,

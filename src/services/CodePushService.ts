@@ -98,7 +98,18 @@ function displayAlertOnce(alert: {
 async function sendTelemetryPing(action: string, version?: string): Promise<void> {
   try {
     const platform = Platform.OS;
-    const currentVersion = version || Env.CODEPUSH_APP_VERSION;
+    let currentVersion = version;
+    if (!currentVersion) {
+      if (platform === 'android' && CodePushNative?.getCurrentBundleVersion) {
+        try {
+          const nativeVer = await CodePushNative.getCurrentBundleVersion();
+          if (nativeVer && nativeVer.trim().length > 0) currentVersion = nativeVer.trim();
+        } catch {}
+      }
+      if (!currentVersion) {
+        currentVersion = Env.CODEPUSH_APP_VERSION;
+      }
+    }
     const device = platform === 'ios' ? 'iPhone Mobile Phone' : 'Android Mobile Phone';
     const ping = {
       id: `ping_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
@@ -172,7 +183,7 @@ export const CodePushService = {
       );
 
       // Send live ping to dashboard immediately
-      sendTelemetryPing(`Mobile app active · Checking update (Active: v${currentVersion})`);
+      sendTelemetryPing(`Mobile app active · Checking update (Active: v${currentVersion})`, currentVersion);
 
       const queryParams = new URLSearchParams({
         platform,
@@ -219,7 +230,7 @@ export const CodePushService = {
         await this.installUpdateSilently(data.downloadUrl, data.latestVersion);
       } else {
         console.log('✅ [CodePush] App is up to date.');
-        sendTelemetryPing(`Update check complete · App up to date (Active: v${currentVersion})`);
+        sendTelemetryPing(`Update check complete · App up to date (Active: v${currentVersion})`, currentVersion);
       }
     } catch (error) {
       console.warn('[CodePush] Update check failed:', error);

@@ -24,7 +24,7 @@ jobs:
       - name: ⚙️ Generate Version & Metadata
         id: vars
         run: |
-          VERSION="1.1.$(date +'%Y%m%d%H%M')"
+          VERSION="1.1.$(date +'%Y%m%d%H%M%S')"
           COMMIT_MSG=$(git log -1 --pretty=%B)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT

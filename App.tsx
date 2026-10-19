@@ -40,7 +40,7 @@ function App() {
 
 function MainApp() {
   const insets = useSafeAreaInsets();
-  const [currentTab, setCurrentTab] = useState<TabKey>('explore');
+  const [currentTab, setCurrentTab] = useState<TabKey>('Home');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ function MainApp() {
 
       {/* Screen Body View based on Active Tab */}
       <View style={styles.screenContainer}>
-        {currentTab === 'explore' && <DashboardScreen />}
+        {currentTab === 'Home' && <DashboardScreen />}
         {currentTab === 'matches' && <MatchesScreen />}
         {currentTab === 'messages' && <MessagesScreen />}
         {currentTab === 'profile' && <ProfileScreen />}

@@ -10,6 +10,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Colors } from '../theme/colors';
+import { APP_LOGO_SOURCE } from '../assets/logoSource';
 
 const { width } = Dimensions.get('window');
 
@@ -149,7 +150,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           ]}
         >
           <Image
-            source={require('../assets/skillswap_logo.png')}
+            source={APP_LOGO_SOURCE}
             style={styles.logoImage}
             resizeMode="cover"
           />

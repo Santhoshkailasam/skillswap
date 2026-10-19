@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Icon } from './Icon';
+import { APP_LOGO_SOURCE } from '../assets/logoSource';
 
 interface DashboardHeaderProps {
   unreadNotifications?: number;
@@ -24,7 +25,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <View style={styles.brandSection}>
           <View style={styles.logoWrapper}>
             <Image
-              source={require('../assets/skillswap_logo.png')}
+              source={APP_LOGO_SOURCE}
               style={styles.logoImage}
               resizeMode="cover"
             />
