@@ -9,7 +9,7 @@ import {
 import { Colors } from '../theme/colors';
 import { Icon, IconName } from './Icon';
 
-export type TabKey = 'explore' | 'matches' | 'create' | 'messages' | 'profile';
+export type TabKey = 'Home' | 'matches' | 'create' | 'messages' | 'profile';
 
 interface TabItem {
   key: TabKey;
@@ -26,7 +26,7 @@ interface BottomTabBarProps {
 }
 
 const TABS: TabItem[] = [
-  { key: 'explore', label: 'Explore', icon: 'home' },
+  { key: 'Home', label: 'Home', icon: 'home' },
   { key: 'matches', label: 'Matches', icon: 'sparkles', badge: 'New' },
   { key: 'create', label: 'Swap', icon: 'plus', isAction: true },
   { key: 'messages', label: 'Chat', icon: 'chat', badge: 2 },

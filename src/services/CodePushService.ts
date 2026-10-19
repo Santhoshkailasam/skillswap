@@ -1,5 +1,7 @@
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, NativeModules } from 'react-native';
 import { Env } from '../config/env';
+
+const { CodePushNative } = NativeModules;
 
 export interface UpdateResponse {
   updateAvailable: boolean;
@@ -154,7 +156,16 @@ export const CodePushService = {
   async checkForUpdates(): Promise<void> {
     try {
       const platform = Platform.OS; // 'android' | 'ios'
-      const currentVersion = Env.CODEPUSH_APP_VERSION;
+      let currentVersion = Env.CODEPUSH_APP_VERSION;
+
+      if (platform === 'android' && CodePushNative?.getCurrentBundleVersion) {
+        try {
+          const nativeVer = await CodePushNative.getCurrentBundleVersion();
+          if (nativeVer && nativeVer.trim().length > 0) {
+            currentVersion = nativeVer.trim();
+          }
+        } catch {}
+      }
 
       console.log(
         `[CodePush] Checking updates for ${platform} (Active: v${currentVersion}, App: ${Env.CODEPUSH_APP_ID})...`
@@ -202,17 +213,10 @@ export const CodePushService = {
         console.log(`⚡ [CodePush] New OTA update available: v${data.latestVersion}. Installing silently...`);
 
         // Send telemetry ping that update was found and ready to download
-        sendTelemetryPing(`Update v${data.latestVersion} found · Alert shown (Ready to download)`, data.latestVersion);
-
-        // Show informational message that version is ready to download (no permission prompt)
-        Alert.alert(
-          'CodePush Update',
-          `Version ${data.latestVersion} is ready to download.\nInstalling update silently in the background...`,
-          [{ text: 'OK' }]
-        );
+        sendTelemetryPing(`Update v${data.latestVersion} found · Downloading & autorefreshing...`, data.latestVersion);
 
         // Download and apply the bundle silently
-        this.installUpdateSilently(data.downloadUrl, data.latestVersion);
+        await this.installUpdateSilently(data.downloadUrl, data.latestVersion);
       } else {
         console.log('✅ [CodePush] App is up to date.');
         sendTelemetryPing(`Update check complete · App up to date (Active: v${currentVersion})`);
@@ -223,18 +227,35 @@ export const CodePushService = {
   },
 
   /**
-   * Silently downloads and stages the OTA bundle in the background
+   * Silently downloads, extracts the bundle to device disk, updates manifest, and autorefreshes the app
    */
   async installUpdateSilently(downloadUrl: string, version: string): Promise<void> {
     try {
       console.log(`[CodePush] Background download started for v${version} from ${downloadUrl}`);
-      const res = await fetch(downloadUrl);
-      if (res.ok) {
-        console.log(`✅ [CodePush] Bundle v${version} downloaded and applied successfully in background.`);
-        sendTelemetryPing(`Update v${version} downloaded & applied silently in background`, version);
+      sendTelemetryPing(`Update v${version} downloading OTA bundle package...`, version);
+
+      if (Platform.OS === 'android' && CodePushNative?.downloadAndApplyBundle) {
+        // 1. Download zip & extract index.android.bundle to app internal storage
+        await CodePushNative.downloadAndApplyBundle(downloadUrl, version);
+
+        // 2. Notify dashboard of successful download & autorefresh
+        await sendTelemetryPing(`Update v${version} downloaded & autorefreshed (New changes active)`, version);
+        console.log(`✅ [CodePush] Bundle v${version} installed. Autorefreshing app...`);
+
+        // 3. Autorefresh app after 1 second so telemetry finishes sending
+        setTimeout(() => {
+          CodePushNative.restartApp();
+        }, 1200);
+      } else {
+        // Fallback for development / non-native
+        const res = await fetch(downloadUrl);
+        if (res.ok) {
+          sendTelemetryPing(`Update v${version} downloaded in background`, version);
+        }
       }
-    } catch {
-      console.warn('[CodePush] Silent update download failed');
+    } catch (err: any) {
+      console.warn('[CodePush] Silent update download failed:', err);
+      sendTelemetryPing(`Update v${version} installation failed: ${err?.message || 'error'}`, version);
     }
   },
 
