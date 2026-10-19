@@ -28,12 +28,12 @@ const FILTER_TABS = [
 const MATCHES: MatchItem[] = [
   {
     id: 'm1',
-    name: 'Kaito Tanaka',
+    name: 'Santhosh',
     initials: 'KT',
     color: '#0284C7',
     matchScore: 99,
-    teaches: 'Native Japanese & Conversation',
-    wants: 'Python & Data Science',
+    teaches: 'App development',
+    wants: 'React native',
     filterTag: 'high',
   },
   {
