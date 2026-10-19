@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { Colors } from '../theme/colors';
 import { Icon } from './Icon';
 
 interface DashboardHeaderProps {

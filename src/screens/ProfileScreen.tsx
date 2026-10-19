@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { Env } from '../config/env';
 
 export const ProfileScreen: React.FC = () => {
   return (
@@ -264,6 +265,21 @@ export const ProfileScreen: React.FC = () => {
           </View>
           <Text style={styles.menuChevron}>›</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* 6. APP VERSION & CODEPUSH OTA FOOTER */}
+      <View style={styles.versionFooter}>
+        <View style={styles.versionBadgeRow}>
+          <Text style={styles.versionAppTitle}>SkillSwap</Text>
+          <View style={styles.versionPill}>
+            <Text style={styles.versionPillText}>v{Env.CODEPUSH_APP_VERSION}</Text>
+          </View>
+        </View>
+        <Text style={styles.versionSubtitle}>Production Build 1.0 · Over-The-Air Sync Active</Text>
+        <View style={styles.otaStatusIndicator}>
+          <View style={styles.otaGreenPulse} />
+          <Text style={styles.otaStatusLabel}>CodePush Live Edge Connected</Text>
+        </View>
       </View>
 
       {/* Bottom spacing for bottom navigation bar */}
@@ -632,5 +648,59 @@ const styles = StyleSheet.create({
   menuDivider: {
     height: 1,
     backgroundColor: '#F1F5F9',
+  },
+  // 5. Version Footer
+  versionFooter: {
+    alignItems: 'center',
+    paddingVertical: 18,
+    marginTop: 6,
+    marginBottom: 8,
+  },
+  versionBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  versionAppTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#334155',
+    letterSpacing: 0.5,
+  },
+  versionPill: {
+    backgroundColor: '#E0F2FE',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+  },
+  versionPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#0284C7',
+  },
+  versionSubtitle: {
+    fontSize: 10.5,
+    color: '#94A3B8',
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  otaStatusIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+  },
+  otaGreenPulse: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+  },
+  otaStatusLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#10B981',
   },
 });

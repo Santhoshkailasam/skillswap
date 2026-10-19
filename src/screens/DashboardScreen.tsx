@@ -52,7 +52,7 @@ const MATCHES_DATA: SkillMatch[] = [
   },
   {
     id: '3',
-    name: 'Maya Lin',
+    name: 'Tony Stark',
     initials: 'ML',
     avatarColor: '#EC4899',
     matchScore: 94,

@@ -41,7 +41,6 @@ function App() {
 function MainApp() {
   const insets = useSafeAreaInsets();
   const [currentTab, setCurrentTab] = useState<TabKey>('explore');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
@@ -52,13 +51,6 @@ function MainApp() {
     const stopListener = CodePushService.startLiveAlertListener();
     return () => stopListener();
   }, []);
-
-  const handleFilterPress = () => {
-    Alert.alert(
-      'Filter Swaps',
-      'Choose swap preferences:\n• Level: Beginner to Pro\n• Timezone: Compatible (±3 hrs)\n• Format: 1-on-1 Live Video'
-    );
-  };
 
   const handleNotificationPress = () => {
     Alert.alert(
