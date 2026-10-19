@@ -31,7 +31,7 @@ jobs:
 
       - name: 🚀 Publish Release to CodePush Server
         run: |
-          node -e '
+          node --input-type=module -e '
             const version = process.env.RELEASE_VERSION;
             const commitMsg = process.env.COMMIT_MSG || "App update";
             const apiKey = process.env.CODEPUSH_API_KEY;
@@ -50,15 +50,16 @@ jobs:
               releaseNotes: `Git Push: ${commitMsg}`
             };
 
-            fetch("https://codepushs.netlify.app/.netlify/functions/publish-release", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-codepush-api-key": apiKey
-              },
-              body: JSON.stringify(payload)
-            })
-            .then(async (res) => {
+            try {
+              console.log("Publishing release to CodePush server...", payload);
+              const res = await fetch("https://codepushs.netlify.app/.netlify/functions/publish-release", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-codepush-api-key": apiKey
+                },
+                body: JSON.stringify(payload)
+              });
               const data = await res.json();
               console.log("Server response status:", res.status);
               console.log("Server response body:", JSON.stringify(data, null, 2));
@@ -67,11 +68,10 @@ jobs:
                 process.exit(1);
               }
               console.log("✅ Release successfully published to CodePush!");
-            })
-            .catch((err) => {
+            } catch (err) {
               console.error("Request error:", err);
               process.exit(1);
-            });
+            }
           '
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.version }}
